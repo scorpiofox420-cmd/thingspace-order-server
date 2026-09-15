@@ -1,0 +1,13 @@
+.git
+.cache
+.local
+.npm
+.acode-snippets
+.bash_history
+MIGRATE
+img
+*.sln
+index.html
+Index.html
+Verizon
+webpack.yml

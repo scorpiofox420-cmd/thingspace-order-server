@@ -1,0 +1,32 @@
+server:
+  # SERVER_PORT/PORT are injected by hosting platforms like Render.
+  port: ${SERVER_PORT:${PORT:8080}}
+
+spring:
+  datasource:
+    # DB_PARAMS lets you append JDBC options, e.g. "?sslmode=require" on Render.
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:thingspace_orders}${DB_PARAMS:}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      # "update" auto-creates/updates tables — fine for dev, switch to a real
+      # migration tool (Flyway/Liquibase) before production.
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+thingspace:
+  oauth-client-id: ${THINGSPACE_OAUTH_CLIENT_ID:}
+  oauth-client-secret: ${THINGSPACE_OAUTH_CLIENT_SECRET:}
+  vz-m2m-token: ${THINGSPACE_VZ_M2M_TOKEN:}
+  account-name: ${THINGSPACE_ACCOUNT_NAME:}
+  request-ids: ${THINGSPACE_REQUEST_IDS:}   # comma-separated list of open order/request UUIDs to poll
+  environment: ${THINGSPACE_ENVIRONMENT:PRODUCTION}
+  poll-interval-ms: ${THINGSPACE_POLL_INTERVAL_MS:300000}
+
+logging:
+  level:
+    com.verizon.thingspace.server: INFO
