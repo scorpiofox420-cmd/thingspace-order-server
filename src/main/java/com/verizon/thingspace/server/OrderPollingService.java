@@ -19,7 +19,7 @@ import java.util.Optional;
  *   - AccountRequestsController.getCurrentAsynchronousRequestStatus(accountName, requestId)
  *     -> GET /m2m/v1/accounts/{aname}/requests/{requestId}/status
  *   - AsynchronousRequestResult has exactly two fields: requestId (String) and
- *     status (RequestStatusEnum) — both used directly below.
+ *     status (String, the wire value e.g. "IN_PROGRESS", "SUCCESS", "FAILED").
  */
 @Service
 @EnableConfigurationProperties(ThingSpaceProperties.class)
