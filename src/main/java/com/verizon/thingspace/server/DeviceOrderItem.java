@@ -48,6 +48,9 @@ public class DeviceOrderItem {
     @Column(name = "credit_check_verified", nullable = false)
     private boolean creditCheckVerified;
 
+    @Column(name = "delivery_method", nullable = false)
+    private String deliveryMethod;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -55,7 +58,7 @@ public class DeviceOrderItem {
 
     public DeviceOrderItem(String model, String color, String storage, int quantity,
                            String addOns, boolean fullCoverage, boolean paidInFull,
-                           boolean autoPay, boolean creditCheckVerified) {
+                           boolean autoPay, boolean creditCheckVerified, String deliveryMethod) {
         this.model = model;
         this.color = color;
         this.storage = storage;
@@ -65,6 +68,7 @@ public class DeviceOrderItem {
         this.paidInFull = paidInFull;
         this.autoPay = autoPay;
         this.creditCheckVerified = creditCheckVerified;
+        this.deliveryMethod = deliveryMethod;
         this.createdAt = Instant.now();
     }
 
@@ -78,5 +82,6 @@ public class DeviceOrderItem {
     public boolean isPaidInFull() { return paidInFull; }
     public boolean isAutoPay() { return autoPay; }
     public boolean isCreditCheckVerified() { return creditCheckVerified; }
+    public String getDeliveryMethod() { return deliveryMethod; }
     public Instant getCreatedAt() { return createdAt; }
 }

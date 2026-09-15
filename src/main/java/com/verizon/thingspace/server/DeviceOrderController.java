@@ -19,9 +19,12 @@ public class DeviceOrderController {
     private static final Logger log = LoggerFactory.getLogger(DeviceOrderController.class);
 
     private final DeviceOrderRepository deviceOrderRepository;
+    private final OrderCustomerInfoRepository customerInfoRepository;
 
-    public DeviceOrderController(DeviceOrderRepository deviceOrderRepository) {
+    public DeviceOrderController(DeviceOrderRepository deviceOrderRepository,
+                                 OrderCustomerInfoRepository customerInfoRepository) {
         this.deviceOrderRepository = deviceOrderRepository;
+        this.customerInfoRepository = customerInfoRepository;
     }
 
     @GetMapping
@@ -29,19 +32,28 @@ public class DeviceOrderController {
         return deviceOrderRepository.findAll();
     }
 
+    @GetMapping("/customer")
+    public OrderCustomerInfo customerInfo() {
+        return customerInfoRepository.findAll().stream().findFirst().orElse(null);
+    }
+
     @GetMapping("/summary")
     public Map<String, Object> summary() {
         List<DeviceOrderItem> items = deviceOrderRepository.findAll();
+        List<OrderCustomerInfo> customers = customerInfoRepository.findAll();
 
         int totalDevices = items.stream().mapToInt(DeviceOrderItem::getQuantity).sum();
         int totalLineItems = items.size();
 
         Map<String, Integer> perModel = new LinkedHashMap<>();
         Map<String, Integer> addonCounts = new LinkedHashMap<>();
+        Map<String, Integer> deliveryCounts = new LinkedHashMap<>();
 
         for (DeviceOrderItem item : items) {
             String label = item.getColor() + " " + item.getModel() + " " + item.getStorage();
             perModel.put(label, item.getQuantity());
+
+            deliveryCounts.merge(item.getDeliveryMethod(), item.getQuantity(), Integer::sum);
 
             if (item.getAddOns() != null) {
                 Arrays.stream(item.getAddOns().split(","))
@@ -59,10 +71,12 @@ public class DeviceOrderController {
         log.info("Device order summary: {} devices across {} line items", totalDevices, totalLineItems);
 
         Map<String, Object> result = new LinkedHashMap<>();
+        result.put("customer", customers.stream().findFirst().orElse(null));
         result.put("totalDevices", totalDevices);
         result.put("totalLineItems", totalLineItems);
         result.put("perModel", perModel);
         result.put("addOnCounts", addonCounts);
+        result.put("deliveryCounts", deliveryCounts);
         result.put("allPaidInFull", allPaidInFull);
         result.put("allAutoPay", allAutoPay);
         result.put("allFullCoverage", allFullCoverage);

@@ -1,9 +1,9 @@
 package com.verizon.thingspace.server;
 
-import com.verizon.m5gedge.VerizonClient;
-import com.verizon.m5gedge.controllers.AccountRequestsController;
-import com.verizon.m5gedge.http.response.ApiResponse;
-import com.verizon.m5gedge.models.AsynchronousRequestResult;
+import com.verizon.thingspace.VerizonClient;
+import com.verizon.thingspace.controllers.AccountRequestsController;
+import com.verizon.thingspace.http.response.ApiResponse;
+import com.verizon.thingspace.models.AsynchronousRequestResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -16,13 +16,10 @@ import java.util.Optional;
  * Polls ThingSpace on a fixed interval for the status of each open request ID
  * and upserts results into Postgres.
  *
- * Fully wired against confirmed real SDK source (io.sdks:verizon-apis-sdk:1.7.0):
  *   - AccountRequestsController.getCurrentAsynchronousRequestStatus(accountName, requestId)
  *     -> GET /m2m/v1/accounts/{aname}/requests/{requestId}/status
  *   - AsynchronousRequestResult has exactly two fields: requestId (String) and
  *     status (RequestStatusEnum) — both used directly below.
- *
- * No placeholder/TODO logic remains in this class.
  */
 @Service
 @EnableConfigurationProperties(ThingSpaceProperties.class)
