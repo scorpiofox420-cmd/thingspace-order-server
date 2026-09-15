@@ -1,0 +1,58 @@
+# docker-compose.yml — local development with Postgres
+#
+# Usage:
+#   docker-compose up          # start everything
+#   docker-compose up app      # start only the app (Postgres must be running)
+#   docker-compose up db       # start only Postgres
+#   docker-compose down        # stop everything
+
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: thingspace-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: thingspace_orders
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: thingspace-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${PORT:-8080}:8080"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: thingspace_orders
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_PARAMS: ""
+      SERVER_PORT: 8080
+      THINGSPACE_OAUTH_CLIENT_ID: ${THINGSPACE_OAUTH_CLIENT_ID:-}
+      THINGSPACE_OAUTH_CLIENT_SECRET: ${THINGSPACE_OAUTH_CLIENT_SECRET:-}
+      THINGSPACE_VZ_M2M_TOKEN: ${THINGSPACE_VZ_M2M_TOKEN:-}
+      THINGSPACE_ACCOUNT_NAME: ${THINGSPACE_ACCOUNT_NAME:-}
+      THINGSPACE_REQUEST_IDS: ${THINGSPACE_REQUEST_IDS:-}
+      THINGSPACE_ENVIRONMENT: ${THINGSPACE_ENVIRONMENT:-PRODUCTION}
+      THINGSPACE_POLL_INTERVAL_MS: ${THINGSPACE_POLL_INTERVAL_MS:-300000}
+
+volumes:
+  pgdata:

@@ -52,6 +52,9 @@ session, you'll have to wire that up separately.
 
 ## Setup
 
+> Full deployment instructions for Render, Docker, bare-metal, and Android
+> (Termux/Acode) are in **[DEPLOY.md](DEPLOY.md)**.
+
 1. Create a Postgres database:
    ```bash
    createdb thingspace_orders
@@ -70,13 +73,15 @@ session, you'll have to wire that up separately.
    export THINGSPACE_VZ_M2M_TOKEN=your_vz_m2m_token
    export THINGSPACE_ACCOUNT_NAME=your_account_name
    export THINGSPACE_REQUEST_IDS=ae1b5618-7620-4197-ab54-bb1d13c561234,f55fea16-3664-4a32-ae9d-c0cbe3eedf1d
-    export THINGSPACE_ENVIRONMENT=PRODUCTION
+   export THINGSPACE_ENVIRONMENT=PRODUCTION
    export THINGSPACE_POLL_INTERVAL_MS=300000
    ```
 
-3. Run it:
+3. Run it (any platform — see DEPLOY.md for all options):
    ```bash
-   mvn spring-boot:run
+   ./start.sh
+   # or: mvn spring-boot:run
+   # or: docker compose up
    ```
 
 The server starts on `http://localhost:8080`. The scheduler kicks off immediately and then

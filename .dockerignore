@@ -11,3 +11,6 @@ index.html
 Index.html
 Verizon
 webpack.yml
+.env
+target
+.gitignore
