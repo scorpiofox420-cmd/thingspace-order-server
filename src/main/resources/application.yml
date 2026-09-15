@@ -26,6 +26,9 @@ thingspace:
   request-ids: ${THINGSPACE_REQUEST_IDS:}   # comma-separated list of open order/request UUIDs to poll
   environment: ${THINGSPACE_ENVIRONMENT:PRODUCTION}
   poll-interval-ms: ${THINGSPACE_POLL_INTERVAL_MS:300000}
+  # Optional base-URL overrides (defaults are production/mock ThingSpace URLs)
+  base-url: ${THINGSPACE_BASE_URL:}
+  credential-base-url: ${THINGSPACE_CREDENTIAL_BASE_URL:}
 
 cors:
   # Comma-separated origins allowed to call the API from the browser.

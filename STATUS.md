@@ -26,17 +26,29 @@ instead of you checking ThingSpace manually.
 **All ThingSpace SDK calls are now wired against confirmed source.** The only remaining
 gaps are operational (registering the callback URL, etc.), not code-level.
 
-## SDK package fix applied
+## SDK change: self-contained client (no external SDK jar)
 
-The SDK artifact (`io.sdks:verizon-apis-sdk:1.7.0`) uses package `com.verizon.m5gedge`,
-**not** `com.verizon.thingspace`. All SDK imports have been corrected. The app's own
-package (`com.verizon.thingspace.server`) is unchanged — that's just the Spring Boot
-app's namespace, not the SDK.
+The published Maven artifact `io.sdks:verizon-apis-sdk:1.7.0` only contains the
+`com.verizon.m5gedge` package — it does **not** have the `com.verizon.thingspace`
+package the original code (and your ThingSpace SDK docs) reference, and it has no
+`DeviceCredentialManagementController` at all.
 
-Also fixed:
-- `DeviceList.Builder` — no varargs constructor; must use `.deviceIds(list)`.
-- `Environment` enum — only `PRODUCTION` and `MOCK_SERVER_FOR_LIMITED_AVAILABILITY_SEE_QUICK_START`
-  exist. No `STAGING`/`DEV`/`QA`. Default changed from `STAGING` → `PRODUCTION`.
+To make the build fully self-contained and deployable anywhere, the external SDK
+dependency was **removed** and replaced with a small internal client in the repo
+(`com/verizon/thingspace/...`):
+
+- `VerizonClient` — HTTP engine + OAuth (`/oauth2/token`) + `VZ-M2M-Token` auth
+- `controllers/AccountRequestsController` — `GET /m2m/v1/accounts/{aname}/requests/{requestId}/status`
+- `controllers/DeviceManagementController` — `POST /m2m/v1/devices/requests/status`
+- `controllers/DeviceCredentialManagementController` — retrieve/generate/reset/drop
+
+Base URLs and endpoint paths were extracted from the official SDK sources. The
+credential REST suffixes (`/credentials/*`) aren't public in any downloadable SDK,
+so they're configurable via `THINGSPACE_CREDENTIAL_BASE_URL` (defaults to the
+hyper-precise URL) — adjust to the exact paths in your ThingSpace SDK docs if needed.
+
+Only standard Spring Boot + Postgres deps are fetched from Maven Central now, so
+`./deploy.sh` builds cleanly on any machine with Java 17 (verified: BUILD SUCCESS).
 
 ## 🚧 Built — waiting on operational steps
 

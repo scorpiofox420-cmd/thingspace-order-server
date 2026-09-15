@@ -32,6 +32,10 @@ public class ThingSpaceProperties {
     /** Which environment to hit: PRODUCTION or MOCK_SERVER_FOR_LIMITED_AVAILABILITY_SEE_QUICK_START. */
     private String environment = "PRODUCTION";
 
+    /** Optional overrides for the API base URLs. */
+    private String baseUrl;
+    private String credentialBaseUrl;
+
     /** Poll interval in milliseconds. */
     private long pollIntervalMs = 300_000; // 5 minutes
 
@@ -54,6 +58,12 @@ public class ThingSpaceProperties {
 
     public String getEnvironment() { return environment; }
     public void setEnvironment(String environment) { this.environment = environment; }
+
+    public String getBaseUrl() { return baseUrl; }
+    public void setBaseUrl(String baseUrl) { this.baseUrl = baseUrl; }
+
+    public String getCredentialBaseUrl() { return credentialBaseUrl; }
+    public void setCredentialBaseUrl(String credentialBaseUrl) { this.credentialBaseUrl = credentialBaseUrl; }
 
     public long getPollIntervalMs() { return pollIntervalMs; }
     public void setPollIntervalMs(long pollIntervalMs) { this.pollIntervalMs = pollIntervalMs; }

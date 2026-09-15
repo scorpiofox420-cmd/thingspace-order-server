@@ -7,12 +7,16 @@ A small Spring Boot service that:
 
 ## Status
 
-Every part of the polling path is confirmed against real SDK source you shared —
-`VerizonClient.Builder`, `AccountRequestsController`, and `AsynchronousRequestResult` —
-so there are no remaining placeholder/TODO calls in that path.
+The app is **fully self-contained** — it no longer depends on the external
+`verizon-apis-sdk` Maven artifact (that jar only ships the `com.verizon.m5gedge`
+package, which doesn't match the `com.verizon.thingspace` API surface this code was
+built against, and has no credential-management controller). Instead it carries a
+small internal client (`com.verizon.thingspace.*`) that calls the exact endpoints
+verified from the official SDK sources. See STATUS.md for details.
 
-A second path was added for **submitting** a Check Order Status request (as opposed to
-polling for an already-known request's status):
+The app builds cleanly with Java 17 + Maven (`./deploy.sh`), verified locally.
+
+Two paths are implemented:
 
 - **`POST /api/orders/check-status`** — builds a `CheckOrderStatusRequest` (confirmed
   fields: `accountName`, optional `orderRequestId`, `devices`) and submits it to ThingSpace

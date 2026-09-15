@@ -135,5 +135,7 @@ CORS_ALLOWED_ORIGINS=https://your-dashboard.vercel.app
 | `THINGSPACE_REQUEST_IDS` | — | Comma-separated request UUIDs to poll |
 | `THINGSPACE_ENVIRONMENT` | `PRODUCTION` | SDK environment |
 | `THINGSPACE_POLL_INTERVAL_MS` | `300000` | Poll interval (ms) |
+| `THINGSPACE_BASE_URL` | *(empty)* | Override the API base URL |
+| `THINGSPACE_CREDENTIAL_BASE_URL` | *(empty)* | Override the credential-management base URL |
 | `CORS_ALLOWED_ORIGINS` | `*` | Comma-separated browser origins allowed to call `/api/**` |
 | `CORS_ALLOWED_METHODS` | `*` | Comma-separated CORS methods (e.g. `GET,POST,PUT`) |
