@@ -16,3 +16,14 @@ target/
 .env
 .env.local
 *.env
+# opencode tool state
+.cache/
+.config/
+.local/
+.npm/
+
+# stray local files
+MIGRATE/
+target-tmp/
+App.config
+Verizon
