@@ -14,11 +14,14 @@ public class DeviceOrderSeeder implements CommandLineRunner {
 
     private final DeviceOrderRepository deviceOrderRepository;
     private final OrderCustomerInfoRepository customerInfoRepository;
+    private final DeviceDetailRepository deviceDetailRepository;
 
     public DeviceOrderSeeder(DeviceOrderRepository deviceOrderRepository,
-                             OrderCustomerInfoRepository customerInfoRepository) {
+                             OrderCustomerInfoRepository customerInfoRepository,
+                             DeviceDetailRepository deviceDetailRepository) {
         this.deviceOrderRepository = deviceOrderRepository;
         this.customerInfoRepository = customerInfoRepository;
+        this.deviceDetailRepository = deviceDetailRepository;
     }
 
     @Override
@@ -46,11 +49,6 @@ public class DeviceOrderSeeder implements CommandLineRunner {
         String appleMusic = "Apple Music";
         String youtubePremium = "YouTube Premium";
 
-        // Delivery methods:
-        //   PICKUP = in-store pickup at Verizon S Westnedge Portage MI
-        //   SHIP   = shipped to address
-        //   NEXT_DAY = next-day delivery (in-store not in stock)
-
         List<DeviceOrderItem> items = List.of(
                 new DeviceOrderItem("Samsung Galaxy S26 Ultra", "Black",    "1TB",  3,
                         huluDisneyDiscovery + "," + youtubePremium, true, true, true, true,
@@ -73,7 +71,19 @@ public class DeviceOrderSeeder implements CommandLineRunner {
         );
 
         deviceOrderRepository.saveAll(items);
-        log.info("Seeded customer info and {} device-order line items ({} total devices).",
+
+        // --- Device details: phone number transfers ---
+        // iPhone 18 Pro Max line 1 of 3: number 269-248-3433 (Makayla's current number) transferred successfully
+        deviceDetailRepository.save(new DeviceDetail(
+                "iPhone 18 Pro Max", "Glacier", "2TB", 1,
+                null, "269-248-3433", "SUCCESSFUL", "Previous Carrier"));
+
+        // iPhone 17 Pro Max Silver line 1 of 2: number 269-548-9133 transferred successfully from other carrier
+        deviceDetailRepository.save(new DeviceDetail(
+                "iPhone 17 Pro Max", "Silver", "2TB", 1,
+                null, "269-548-9133", "SUCCESSFUL", "Previous Carrier"));
+
+        log.info("Seeded customer info, {} device-order line items ({} total devices), and 2 device details with phone transfers.",
                 items.size(), items.stream().mapToInt(DeviceOrderItem::getQuantity).sum());
     }
 }

@@ -92,6 +92,14 @@ repeats every `THINGSPACE_POLL_INTERVAL_MS` milliseconds (default: every 5 minut
 | POST   | `/api/orders/poll-now`        | Trigger an immediate poll cycle (for testing)      |
 | GET    | `/api/device-orders`          | Current device-order manifest (line items)          |
 | GET    | `/api/device-orders/summary`  | Totals, per-model counts, and add-on counts         |
+| GET    | `/api/device-details`         | Per-device tracking (IMEI, phone numbers, transfers) |
+| GET    | `/api/device-details/summary` | Transfer status summary                              |
+| POST   | `/api/device-details`         | Add a new device detail                              |
+| PUT    | `/api/device-details/{id}`    | Update a device detail                               |
+| POST   | `/api/credentials/retrieve`   | Retrieve device credentials from ThingSpace          |
+| POST   | `/api/credentials/generate`   | Generate device credentials                          |
+| POST   | `/api/credentials/reset`      | Reset device credentials                             |
+| POST   | `/api/credentials/drop`       | Drop device credentials                              |
 | POST   | `/api/callbacks/device-service` | Webhook receiver for ThingSpace async callbacks  |
 | GET    | `/api/callbacks`              | View raw callback payloads received                |
 
