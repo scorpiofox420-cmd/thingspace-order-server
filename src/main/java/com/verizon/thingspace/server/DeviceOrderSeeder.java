@@ -54,10 +54,10 @@ public class DeviceOrderSeeder implements CommandLineRunner {
         List<DeviceOrderItem> items = List.of(
                 new DeviceOrderItem("Samsung Galaxy S26 Ultra", "Black",    "1TB",  3,
                         huluDisneyDiscovery + "," + youtubePremium, true, true, true, true,
-                        "NEXT_DAY"),
+                        "PICKUP"),
                 new DeviceOrderItem("Samsung Galaxy S26 Ultra", "Violet",   "512GB", 1,
                         huluDisneyDiscovery + "," + youtubePremium, true, true, true, true,
-                        "NEXT_DAY"),
+                        "PICKUP"),
                 new DeviceOrderItem("iPhone 18 Pro Max",        "Glacier",  "2TB",  3,
                         huluDisneyDiscovery + "," + appleMusic,     true, true, true, true,
                         "SHIP"),

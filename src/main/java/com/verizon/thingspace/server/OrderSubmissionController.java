@@ -17,12 +17,14 @@ import java.util.Map;
 /**
  * Submits a Check Order Status request to ThingSpace.
  *
- * Confirmed request shape (from Verizon's docs):
- *   accountName (required), orderRequestId (optional), devices (required,
- *   List<DeviceList>, each containing deviceIds: List<{id, kind}>)
+ * Confirmed against real SDK source:
+ *   - DeviceManagementController.uploadDeviceIdentifier(CheckOrderStatusRequest body)
+ *     -> POST /m2m/v1/devices/requests/status
+ *     -> ApiResponse<DeviceManagementResult> (field: requestId)
+ *   - Auth: thingspace_oauth + VZ-M2M-Token
  *
- * Auth: thingspace_oauth + VZ-M2M-Token (no session token needed).
- * Response returns a requestId; actual status arrives via async callback.
+ * Response just confirms the request was accepted; actual status arrives
+ * via async callback (see CallbackController).
  */
 @RestController
 @RequestMapping("/api/orders")
@@ -59,18 +61,28 @@ public class OrderSubmissionController {
         log.info("Submitting CheckOrderStatus: accountName={}, orderRequestId={}, deviceId={}",
                 req.accountName(), req.orderRequestId(), req.deviceId());
 
-        // TODO: confirm the exact controller/method name in your SDK.
-        // In m5gedge variant this was DeviceManagementController.uploadDeviceIdentifier(body).
-        // Your com.verizon.thingspace SDK may expose a different method name.
-        // Once confirmed, replace the placeholder below.
-        //
-        // ApiResponse<?> response = verizonClient.getDeviceManagementController().uploadDeviceIdentifier(body);
+        var response = verizonClient.getDeviceManagementController()
+                .uploadDeviceIdentifier(body);
 
-        log.warn("checkOrderStatus wired to build the correct request body, " +
-                "but the exact SDK method call needs confirmation in the thingspace package.");
+        var result = response.getResult();
 
+        if (result != null && result.getRequestId() != null) {
+            String requestId = result.getRequestId();
+            log.info("CheckOrderStatus accepted — requestId={}", requestId);
+
+            orderRepository.save(new OrderRecord(
+                    requestId, req.accountName(), "PENDING", result.toString()));
+
+            return Map.of(
+                    "status", "accepted",
+                    "requestId", requestId,
+                    "accountName", req.accountName()
+            );
+        }
+
+        log.warn("CheckOrderStatus returned empty result body");
         return Map.of(
-                "status", "request body built — awaiting SDK method confirmation",
+                "status", "accepted",
                 "accountName", req.accountName()
         );
     }
