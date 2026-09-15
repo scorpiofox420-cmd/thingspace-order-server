@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ThingSpace Order Dashboard</title>
+<style>
+  :root {
+    --red: #cd040b;
+    --dark: #1a1a1a;
+    --gray: #6b6b6b;
+    --light: #f5f5f5;
+    --border: #e2e2e2;
+    --green: #1e8e3e;
+    --amber: #b76e00;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--light); color: var(--dark); line-height: 1.45;
+  }
+  header {
+    background: var(--dark); color: #fff; padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+  header h1 { font-size: 20px; letter-spacing: .3px; }
+  header h1 span { color: var(--red); }
+  header .controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  header input[type="text"] {
+    background: #2c2c2c; color: #fff; border: 1px solid #444; border-radius: 6px;
+    padding: 6px 10px; font-size: 13px; min-width: 260px;
+  }
+  button {
+    background: var(--red); color: #fff; border: none; border-radius: 6px;
+    padding: 7px 14px; font-size: 13px; cursor: pointer; font-weight: 600;
+  }
+  button:hover { filter: brightness(1.1); }
+  button.secondary { background: #444; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 20px 24px 60px; }
+  .status-line { font-size: 13px; color: var(--gray); margin-bottom: 16px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .card {
+    background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px;
+  }
+  .card .val { font-size: 28px; font-weight: 700; }
+  .card .lbl { font-size: 12px; color: var(--gray); text-transform: uppercase; letter-spacing: .4px; }
+  .card.green .val { color: var(--green); }
+  .card.amber .val { color: var(--amber); }
+  .card.red .val { color: var(--red); }
+  section { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 20px; }
+  section h2 { font-size: 15px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: .4px; color: var(--dark); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: var(--gray); font-weight: 600; padding: 6px 8px; border-bottom: 2px solid var(--border); }
+  td { padding: 7px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .chip {
+    display: inline-block; background: #f0f0f0; border-radius: 20px; padding: 3px 10px;
+    font-size: 12px; margin: 2px 4px 2px 0; font-weight: 500;
+  }
+  .chip.pickup { background: #e7f0fb; color: #1b4d8f; }
+  .chip.ship { background: #e9f7eb; color: #1e6b32; }
+  .chip.next_day { background: #fdf1e3; color: #9c4d00; }
+  .badge {
+    display: inline-block; border-radius: 20px; padding: 2px 10px; font-size: 12px; font-weight: 600;
+  }
+  .badge.success { background: #e9f7eb; color: var(--green); }
+  .badge.pending, .badge.in_progress { background: #fdf1e3; color: var(--amber); }
+  .badge.failed { background: #fde8e8; color: var(--red); }
+  .badge.idle { background: #eee; color: var(--gray); }
+  pre {
+    background: #1a1a1a; color: #9ee493; padding: 12px; border-radius: 8px; overflow-x: auto;
+    font-size: 12px; max-height: 300px; overflow-y: auto; margin-top: 8px;
+  }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+  .muted { color: var(--gray); }
+  .error-box {
+    background: #fde8e8; border: 1px solid #f2c4c4; color: #b22020; border-radius: 8px;
+    padding: 12px 14px; font-size: 13px; margin-bottom: 16px; display: none;
+  }
+  footer { text-align: center; color: var(--gray); font-size: 12px; padding: 20px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ThingSpace <span>Order Dashboard</span></h1>
+  <div class="controls">
+    <input type="text" id="apiBase" placeholder="API base URL (default: this origin)" />
+    <button class="secondary" onclick="refreshAll()">Refresh</button>
+    <button onclick="pollNow()">Poll now</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="error-box" id="errorBox"></div>
+  <div class="status-line" id="statusLine">Loading…</div>
+
+  <!-- Top stat cards -->
+  <div class="cards" id="statCards"></div>
+
+  <section id="customerSection" style="display:none">
+    <h2>Customer</h2>
+    <div id="customerBody"></div>
+  </section>
+
+  <div class="grid2">
+    <section id="modelSection" style="display:none">
+      <h2>Order Breakdown</h2>
+      <table>
+        <thead><tr><th>Device</th><th>Qty</th><th>Delivery</th></tr></thead>
+        <tbody id="modelBody"></tbody>
+      </table>
+      <div id="addonChips" style="margin-top:12px"></div>
+    </section>
+
+    <section id="transferSection" style="display:none">
+      <h2>Phone Number Transfers</h2>
+      <table>
+        <thead><tr><th>Device</th><th>Line</th><th>Number</th><th>Status</th><th>From</th></tr></thead>
+        <tbody id="transferBody"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <div class="grid2">
+    <section id="orderSection" style="display:none">
+      <h2>Request Status (ThingSpace)</h2>
+      <table>
+        <thead><tr><th>Request ID</th><th>Status</th><th>Collected</th></tr></thead>
+        <tbody id="orderBody"></tbody>
+      </table>
+    </section>
+
+    <section id="callbackSection" style="display:none">
+      <h2>Callbacks</h2>
+      <table>
+        <thead><tr><th>Received</th><th></th></tr></thead>
+        <tbody id="callbackBody"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <section id="detailSection" style="display:none">
+    <h2>All Device Details</h2>
+    <table>
+      <thead><tr><th>Device</th><th>Line</th><th>IMEI</th><th>Phone</th><th>Status</th></tr></thead>
+      <tbody id="detailBody"></tbody>
+    </table>
+  </section>
+</div>
+
+<footer>ThingSpace Order Server · dashboard auto-refreshes every 60s</footer>
+
+<script>
+const params = new URLSearchParams(location.search);
+const apiInput = document.getElementById('apiBase');
+function apiUrl() {
+  let base = apiInput.value.trim();
+  if (!base) base = params.get('api') || location.origin;
+  return base.replace(/\/+$/, '');
+}
+apiInput.value = apiUrl();
+
+let lastGood = null;
+async function fetchJson(path) {
+  const res = await fetch(apiUrl() + path, { headers: { 'Accept': 'application/json' } });
+  if (!res.ok) throw new Error(path + ' → HTTP ' + res.status);
+  return res.json();
+}
+function esc(text) {
+  return String(text == null ? '' : text).replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function shortDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return isNaN(d) ? iso : d.toLocaleString();
+}
+function showError(msg) {
+  document.getElementById('errorBox').style.display = 'block';
+  document.getElementById('errorBox').textContent = 'API error: ' + msg;
+}
+function clearError() { document.getElementById('errorBox').style.display = 'none'; }
+function setStatus(t) { document.getElementById('statusLine').textContent = t; }
+
+async function pollNow() {
+  setStatus('Triggering poll cycle…');
+  try {
+    const res = await fetch(apiUrl() + '/api/orders/poll-now', { method: 'POST' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    setStatus('Poll cycle triggered at ' + new Date().toLocaleTimeString());
+    setTimeout(refreshAll, 2000);
+  } catch (e) { showError(e.message); setStatus('Poll trigger failed'); }
+}
+
+async function refreshAll() {
+  try {
+    const started = performance.now();
+    const paths = [
+      '/api/device-orders/summary', '/api/device-orders', '/api/device-details',
+      '/api/device-details/summary'
+    ];
+    const results = await Promise.all(paths.map(p => fetchJson(p).catch(() => null)));
+    const [summary, orders, details, detailSummary] = results;
+
+    let reqStatus = null, callbacks = null;
+    try {
+      const second = await Promise.all([
+        fetchJson('/api/orders'), fetchJson('/api/callbacks')
+      ]);
+      reqStatus = second[0]; callbacks = second[1];
+    } catch (e) { /* optional endpoints */ }
+
+    lastGood = { summary, orders, details, detailSummary, reqStatus, callbacks };
+    render(lastGood);
+    clearError();
+    const ms = Math.round(performance.now() - started);
+    setStatus('Updated ' + new Date().toLocaleTimeString() + ' · API: ' + apiUrl() + ' · ' + ms + 'ms');
+  } catch (e) {
+    showError(e.message);
+    if (lastGood) setStatus('Offline — showing last good data. ' + e.message);
+    else setStatus('Cannot reach API at ' + apiUrl());
+  }
+}
+
+function render({ summary, orders, details, detailSummary, reqStatus, callbacks }) {
+  // --- Stat cards ---
+  const s = summary || {};
+  const cust = s.customer;
+  const ds = detailSummary || {};
+  const cards = document.getElementById('statCards');
+  cards.innerHTML = '';
+  addCard(cards, 'Total devices', s.totalDevices ?? '—', '');
+  addCard(cards, 'Line items', s.totalLineItems ?? '—', '');
+  addCard(cards, 'Transfers', ds.totalTransfers ?? '—', 'amber');
+  addCard(cards, 'Successful', ds.successfulTransfers ?? '—', 'green');
+  addCard(cards, 'Pending', ds.pendingTransfers ?? '—', '');
+  addCard(cards, 'Requests tracked', reqStatus ? reqStatus.length : '—', '');
+
+  // --- Customer ---
+  if (cust && cust.fullName) {
+    document.getElementById('customerSection').style.display = '';
+    const c = document.getElementById('customerBody');
+    c.innerHTML = '';
+    const a = cust.addressLine1 + (cust.addressLine2 ? ', ' + cust.addressLine2 : '') +
+      ', ' + cust.city + ', ' + cust.state + (cust.zipCode ? ' ' + cust.zipCode : '');
+    ['fullName', 'email', 'phone'].forEach(k => {
+      const row = document.createElement('div');
+      row.style.marginBottom = '4px';
+      row.innerHTML = '<strong>' + (k === 'fullName' ? 'Name' : (k === 'email' ? 'Email' : 'Phone')) +
+        ':</strong> ' + esc(cust[k]);
+      c.appendChild(row);
+    });
+    addLine(c, 'Address', a);
+    if (cust.pickupLocation) addLine(c, 'Pickup', cust.pickupLocation);
+  }
+
+  // --- Order breakdown ---
+  if (s.perModel && Object.keys(s.perModel).length) {
+    document.getElementById('modelSection').style.display = '';
+    const tbody = document.getElementById('modelBody');
+    tbody.innerHTML = '';
+    for (const [label, qty] of Object.entries(s.perModel)) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + esc(label) + '</td><td>' + esc(qty) + '</td><td></td>';
+      tbody.appendChild(tr);
+    }
+    if (s.deliveryCounts) {
+      const tbody2 = document.getElementById('modelBody');
+      for (const [m, qty] of Object.entries(s.deliveryCounts)) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td class="muted">Delivery · ' + esc(xform(m)) + '</td><td>' + esc(qty) + '</td><td></td>';
+        tbody2.appendChild(tr);
+      }
+    }
+    const chips = document.getElementById('addonChips');
+    chips.innerHTML = '<div class="muted" style="font-size:12px;margin-bottom:4px">Add-ons included</div>' +
+      (s.addOnCounts ? Object.entries(s.addOnCounts).map(([a, q]) =>
+        '<span class="chip">' + esc(a) + ' × ' + esc(q) + '</span>').join('') : '');
+  }
+
+  // --- Phone transfers ---
+  const transferList = (details || []).filter(d => d.phoneNumber || d.transferStatus);
+  if (transferList.length) {
+    document.getElementById('transferSection').style.display = '';
+    document.getElementById('transferBody').innerHTML = transferList.map(d =>
+      '<tr><td>' + esc(d.deviceModel + ' ' + (d.color||'') + ' ' + (d.storage||'')) + '</td>' +
+      '<td>' + esc(d.lineNumber) + '</td>' +
+      '<td>' + esc(d.phoneNumber || '—') + '</td>' +
+      '<td>' + statusBadge(d.transferStatus) + '</td>' +
+      '<td class="muted">' + esc(d.transferFromCarrier || '—') + '</td></tr>').join('');
+  }
+
+  // --- All device details ---
+  if (details && details.length) {
+    document.getElementById('detailSection').style.display = '';
+    document.getElementById('detailBody').innerHTML = details.map(d =>
+      '<tr><td>' + esc(d.deviceModel + ' ' + (d.color||'') + ' ' + (d.storage||'')) + '</td>' +
+      '<td>' + esc(d.lineNumber) + '</td>' +
+      '<td>' + esc(d.imei || '—') + '</td>' +
+      '<td>' + esc(d.phoneNumber || '—') + '</td>' +
+      '<td>' + statusBadge(d.transferStatus) + '</td></tr>').join('');
+  }
+
+  // --- Request status ---
+  if (reqStatus && reqStatus.length) {
+    document.getElementById('orderSection').style.display = '';
+    document.getElementById('orderBody').innerHTML = reqStatus.slice().reverse().map(r =>
+      '<tr><td>' + esc(r.requestId) + '</td>' +
+      '<td>' + statusBadge(r.status) + '</td>' +
+      '<td class="muted">' + shortDate(r.collectedAt) + '</td></tr>').join('');
+  }
+
+  // --- Callbacks ---
+  if (callbacks && callbacks.length) {
+    document.getElementById('callbackSection').style.display = '';
+    document.getElementById('callbackBody').innerHTML = callbacks.slice().reverse().map(c =>
+      '<tr><td class="muted" style="white-space:nowrap">' + shortDate(c.receivedAt) + '</td>' +
+      '<td><pre>' + esc(brief(c.rawPayload, 600)) + '</pre></td></tr>').join('');
+  }
+}
+
+function addCard(root, label, val, toneClass) {
+  const div = document.createElement('div');
+  div.className = 'card ' + toneClass;
+  div.innerHTML = '<div class="val">' + esc(val) + '</div><div class="lbl">' + esc(label) + '</div>';
+  root.appendChild(div);
+}
+function addLine(root, label, value) {
+  const div = document.createElement('div');
+  div.style.marginBottom = '4px';
+  div.innerHTML = '<strong>' + esc(label) + ':</strong> ' + esc(value);
+  root.appendChild(div);
+}
+function xform(m) { return String(m).toLowerCase().replace(/_/g, ' '); }
+function statusBadge(st) {
+  const s = String(st || '—').toUpperCase();
+  let cls = 'idle';
+  if (s.includes('SUCCESS') || s.includes('COMPLETE')) cls = 'success';
+  else if (s.includes('PROGRESS') || s.includes('PENDING') || s.includes('QUEUED')) cls = 'in_progress';
+  else if (s.includes('FAIL') || s.includes('ERROR')) cls = 'failed';
+  return '<span class="badge ' + cls + '">' + esc(st || '—') + '</span>';
+}
+function brief(text, n) { return String(text).length > n ? String(text).slice(0, n) + ' …' : String(text); }
+
+refreshAll();
+setInterval(refreshAll, 60000);
+</script>
+</body>
+</html>

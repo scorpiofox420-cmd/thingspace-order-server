@@ -64,3 +64,7 @@ services:
         value: PRODUCTION
       - key: THINGSPACE_POLL_INTERVAL_MS
         value: "300000"
+      - key: CORS_ALLOWED_ORIGINS
+        value: fromEnv
+      - key: CORS_ALLOWED_METHODS
+        value: "*"

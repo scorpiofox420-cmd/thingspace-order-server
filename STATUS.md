@@ -49,7 +49,12 @@ Also fixed:
 
 - Registering your callback URL with ThingSpace (`ConnectivityCallbacksController` — untouched so far)
 - Session token handling (confirmed **not needed** for the endpoints used so far, since their `@withAuth` blocks don't require `sessionToken` — but may be needed if you add other endpoints later)
-- Any UI — this is API-only right now; you'd hit it with `curl`, Postman, or a browser for GET requests
+
+## ✅ UI
+
+A self-contained **web dashboard** is in `dashboard/` (deploy to Vercel or open locally).
+It reads the API and shows: customer info, order breakdown, phone-number transfers,
+request status, and raw callbacks. See DEPLOY.md §5.
 
 ## Why two different data models exist
 

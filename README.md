@@ -89,6 +89,10 @@ repeats every `THINGSPACE_POLL_INTERVAL_MS` milliseconds (default: every 5 minut
 
 ## API
 
+> There's also a **web dashboard** (single static page in `dashboard/`) you can
+> deploy to Vercel or open from `file://`. See DEPLOY.md §5 and pass the API URL
+> with `?api=https://your-api.example.com`.
+
 | Method | Path                          | Description                                    |
 |--------|-------------------------------|--------------------------------------------------|
 | GET    | `/api/orders`                 | All collected request-status records              |

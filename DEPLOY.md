@@ -90,16 +90,30 @@ cp .env.example .env
 Server: `http://localhost:8080`. On your phone, open `http://192.168.x.x:8080`
 from other devices on the same Wi-Fi.
 
-## 5. Vercel
+## 5. Vercel (web dashboard)
 
-**Java/Spring Boot cannot run on Vercel** (it's a Node.js/serverless platform).
-Options:
+**Java/Spring Boot cannot run on Vercel** (it's a Node.js/serverless platform), but the
+**web dashboard** that reads the API *can*. It's a single static HTML file at
+`dashboard/`.
 
-- **Keep the API on Render/Docker** and point a Vercel-hosted dashboard at it:
-  the app already exposes clean JSON at `/api/device-orders`, `/api/device-details`,
-  `/api/orders`, `/api/callbacks`.
-- If you want a Vercel deployment, serve the existing `index.html` as a static
-  page that reads those endpoints (needs CORS enabled on the API).
+**Deploy:**
+
+1. Keep the API running on Render (section 1) or localhost.
+2. On vercel.com, create a project and set **Root Directory** to `dashboard`
+   (this repo contains a `dashboard/vercel.json` that makes Vercel serve it as-is).
+3. Deploy. You get a URL like `https://your-dashboard.vercel.app`.
+4. Open the dashboard with the API base set:
+   ```
+   https://your-dashboard.vercel.app/?api=https://your-app.onrender.com
+   ```
+   (or type the API URL into the box in the dashboard header — it's saved for the session).
+
+**CORS:** the API server allows browser calls from any origin by default
+(`CORS_ALLOWED_ORIGINS=*`, configured in `application.yml`). For production,
+lock it down:
+```
+CORS_ALLOWED_ORIGINS=https://your-dashboard.vercel.app
+```
 
 ---
 
@@ -121,3 +135,5 @@ Options:
 | `THINGSPACE_REQUEST_IDS` | — | Comma-separated request UUIDs to poll |
 | `THINGSPACE_ENVIRONMENT` | `PRODUCTION` | SDK environment |
 | `THINGSPACE_POLL_INTERVAL_MS` | `300000` | Poll interval (ms) |
+| `CORS_ALLOWED_ORIGINS` | `*` | Comma-separated browser origins allowed to call `/api/**` |
+| `CORS_ALLOWED_METHODS` | `*` | Comma-separated CORS methods (e.g. `GET,POST,PUT`) |
