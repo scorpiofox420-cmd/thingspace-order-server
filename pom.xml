@@ -39,6 +39,13 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- In-memory DB for local runs with SPRING_PROFILES_ACTIVE=h2 (no Postgres needed) -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- Validation for config/env values -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
