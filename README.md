@@ -90,6 +90,8 @@ repeats every `THINGSPACE_POLL_INTERVAL_MS` milliseconds (default: every 5 minut
 | GET    | `/api/orders/{requestId}`     | Record for a single request ID                    |
 | POST   | `/api/orders/check-status`    | Submit a Check Order Status request (returns requestId) |
 | POST   | `/api/orders/poll-now`        | Trigger an immediate poll cycle (for testing)      |
+| GET    | `/api/device-orders`          | Current device-order manifest (line items)          |
+| GET    | `/api/device-orders/summary`  | Totals, per-model counts, and add-on counts         |
 | POST   | `/api/callbacks/device-service` | Webhook receiver for ThingSpace async callbacks  |
 | GET    | `/api/callbacks`              | View raw callback payloads received                |
 
