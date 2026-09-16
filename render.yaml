@@ -1,4 +1,4 @@
-# Render Blueprint — deploys the web service + a managed Postgres database.
+# Render Blueprint - deploys the web service + a managed Postgres database.
 #
 # How to use:
 #   1. Push this repo to GitHub (see README "Deploy" notes).
@@ -10,15 +10,17 @@
 # callbacks actually arrive:
 #   https://<your-app>.onrender.com/api/callbacks/device-service
 #
-# secrets are managed by Render "Environment" / env var groups — set the
-# ThingSpace credential keys there (Blueprints will prompt you for fromEnv
-# vars if you list them with value.fromEnv).
+# Secrets are managed by Render env var groups. providePassword must be true
+# so the DB password is exposed to fromDatabase (otherwise sync fails).
+
+version: "1"
 
 databases:
   - name: thingspace-orders-db
     plan: free
     databaseName: thingspace_orders
     user: thingspace
+    providePassword: true
 
 services:
   - type: web
@@ -50,6 +52,7 @@ services:
           property: password
       - key: DB_PARAMS
         value: "?sslmode=require"
+      # --- Required: you must provide these at Blueprint creation ---
       - key: THINGSPACE_OAUTH_CLIENT_ID
         value: fromEnv
       - key: THINGSPACE_OAUTH_CLIENT_SECRET
@@ -58,17 +61,16 @@ services:
         value: fromEnv
       - key: THINGSPACE_ACCOUNT_NAME
         value: fromEnv
-      - key: THINGSPACE_REQUEST_IDS
-        value: fromEnv
       - key: THINGSPACE_ENVIRONMENT
         value: PRODUCTION
+      # --- Optional: set in the Render dashboard later if needed ---
+      - key: THINGSPACE_REQUEST_IDS
+        sync: false
+      - key: THINGSPACE_BASE_URL
+        sync: false
+      - key: THINGSPACE_CREDENTIAL_BASE_URL
+        sync: false
       - key: THINGSPACE_POLL_INTERVAL_MS
         value: "300000"
-      - key: THINGSPACE_BASE_URL
-        value: fromEnv
-      - key: THINGSPACE_CREDENTIAL_BASE_URL
-        value: fromEnv
-      - key: CORS_ALLOWED_ORIGINS
-        value: fromEnv
       - key: CORS_ALLOWED_METHODS
         value: "*"
