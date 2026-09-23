@@ -96,6 +96,7 @@ public class CredentialController {
     public record CredentialApiRequest(
             String accountName,
             String servicePlan,
+            String eCPD,
             List<String> deviceIds
     ) {}
 
@@ -105,8 +106,8 @@ public class CredentialController {
                 .toList();
 
         return new CredentialsRequest.Builder(
+                req.eCPD(),
                 req.accountName(),
-                req.servicePlan(),
                 items
         ).build();
     }
