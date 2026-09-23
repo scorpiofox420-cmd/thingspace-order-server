@@ -1,6 +1,7 @@
 package com.verizon.thingspace.server;
 
 import com.verizon.thingspace.VerizonClient;
+import com.verizon.thingspace.models.ActivateDevicesRequest;
 import com.verizon.thingspace.models.CheckOrderStatusRequest;
 import com.verizon.thingspace.models.DeviceList;
 import com.verizon.thingspace.models.DeviceId;
@@ -34,10 +35,13 @@ public class OrderSubmissionController {
 
     private final VerizonClient verizonClient;
     private final OrderRepository orderRepository;
+    private final ThingSpaceProperties properties;
 
-    public OrderSubmissionController(VerizonClient verizonClient, OrderRepository orderRepository) {
+    public OrderSubmissionController(VerizonClient verizonClient, OrderRepository orderRepository,
+                                     ThingSpaceProperties properties) {
         this.verizonClient = verizonClient;
         this.orderRepository = orderRepository;
+        this.properties = properties;
     }
 
     public record CheckStatusApiRequest(
@@ -84,6 +88,44 @@ public class OrderSubmissionController {
         return Map.of(
                 "status", "accepted",
                 "accountName", req.accountName()
+        );
+    }
+
+    /**
+     * Activates service for one or more devices (calls Verizon's
+     * POST /m2m/v1/devices/actions/activate) and saves the returned
+     * requestId so the polling loop tracks its status.
+     */
+    @PostMapping("/activate")
+    public Map<String, String> activateDevices(@RequestBody ActivateDevicesRequest req) throws Exception {
+        String accountName = req.getAccountName() != null ? req.getAccountName()
+                : properties.getAccountName();
+
+        log.info("Submitting device activation: devices={}, servicePlan={}, accountName={}",
+                req.getDevices() == null ? 0 : req.getDevices().size(),
+                req.getServicePlan(), accountName);
+
+        var response = verizonClient.getDeviceManagementController().activateDevices(req);
+        var result = response.getResult();
+
+        if (result != null && result.getRequestId() != null) {
+            String requestId = result.getRequestId();
+            log.info("Activation accepted — requestId={}", requestId);
+
+            orderRepository.save(new OrderRecord(
+                    requestId, accountName, "PENDING", result.toString()));
+
+            return Map.of(
+                    "status", "accepted",
+                    "requestId", requestId,
+                    "accountName", accountName == null ? "" : accountName
+            );
+        }
+
+        log.warn("Activation returned empty result body");
+        return Map.of(
+                "status", "accepted",
+                "accountName", accountName == null ? "" : accountName
         );
     }
 }
