@@ -34,7 +34,10 @@ public class ThingSpaceClientConfig {
                 credentialBaseUrl,
                 properties.getOauthClientId(),
                 properties.getOauthClientSecret(),
-                properties.getVzM2mToken());
+                properties.getVzM2mToken(),
+                properties.getUwsUsername(),
+                properties.getUwsPassword(),
+                properties.getOauthClockSkew());
     }
 
     private static String firstNonNull(String a, String b) {

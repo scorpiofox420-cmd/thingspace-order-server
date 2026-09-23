@@ -22,10 +22,13 @@ thingspace:
   oauth-client-id: ${THINGSPACE_OAUTH_CLIENT_ID:}
   oauth-client-secret: ${THINGSPACE_OAUTH_CLIENT_SECRET:}
   vz-m2m-token: ${THINGSPACE_VZ_M2M_TOKEN:}
+  uws-username: ${THINGSPACE_UWS_USERNAME:}   # optional: auto-generates the VZ-M2M session token
+  uws-password: ${THINGSPACE_UWS_PASSWORD:}
   account-name: ${THINGSPACE_ACCOUNT_NAME:}
   request-ids: ${THINGSPACE_REQUEST_IDS:}   # comma-separated list of open order/request UUIDs to poll
   environment: ${THINGSPACE_ENVIRONMENT:PRODUCTION}
   poll-interval-ms: ${THINGSPACE_POLL_INTERVAL_MS:300000}
+  oauth-clock-skew: ${THINGSPACE_OAUTH_CLOCK_SKEW:60}   # seconds applied when checking token expiry
   # Optional base-URL overrides (defaults are production/mock ThingSpace URLs)
   base-url: ${THINGSPACE_BASE_URL:}
   credential-base-url: ${THINGSPACE_CREDENTIAL_BASE_URL:}

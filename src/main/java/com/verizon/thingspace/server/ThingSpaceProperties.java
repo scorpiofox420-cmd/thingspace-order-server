@@ -15,8 +15,15 @@ public class ThingSpaceProperties {
     private String oauthClientId;
     private String oauthClientSecret;
 
-    /** Custom header credential for VZ-M2M-Token. */
+    /** Custom header credential for VZ-M2M-Token (static). */
     private String vzM2mToken;
+
+    /**
+     * UWS credentials. When both are set and no vzM2mToken is configured, the
+     * client generates the VZ-M2M session token programmatically.
+     */
+    private String uwsUsername;
+    private String uwsPassword;
 
     /** Your ThingSpace account name, e.g. "0251687987-0001". */
     private String accountName;
@@ -39,6 +46,9 @@ public class ThingSpaceProperties {
     /** Poll interval in milliseconds. */
     private long pollIntervalMs = 300_000; // 5 minutes
 
+    /** Clock skew in seconds applied when checking OAuth token expiry. */
+    private long oauthClockSkew = 60L;
+
     // --- getters/setters ---
 
     public String getOauthClientId() { return oauthClientId; }
@@ -49,6 +59,12 @@ public class ThingSpaceProperties {
 
     public String getVzM2mToken() { return vzM2mToken; }
     public void setVzM2mToken(String vzM2mToken) { this.vzM2mToken = vzM2mToken; }
+
+    public String getUwsUsername() { return uwsUsername; }
+    public void setUwsUsername(String uwsUsername) { this.uwsUsername = uwsUsername; }
+
+    public String getUwsPassword() { return uwsPassword; }
+    public void setUwsPassword(String uwsPassword) { this.uwsPassword = uwsPassword; }
 
     public String getAccountName() { return accountName; }
     public void setAccountName(String accountName) { this.accountName = accountName; }
@@ -67,4 +83,7 @@ public class ThingSpaceProperties {
 
     public long getPollIntervalMs() { return pollIntervalMs; }
     public void setPollIntervalMs(long pollIntervalMs) { this.pollIntervalMs = pollIntervalMs; }
+
+    public long getOauthClockSkew() { return oauthClockSkew; }
+    public void setOauthClockSkew(long oauthClockSkew) { this.oauthClockSkew = oauthClockSkew; }
 }

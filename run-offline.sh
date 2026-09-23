@@ -37,7 +37,7 @@ start() {
     return
   fi
   echo "Starting ThingSpace Order Server (offline, H2) on http://0.0.0.0:$PORT ..."
-  nohup java -jar "$JAR" \
+  setsid nohup java -jar "$JAR" \
     --spring.profiles.active=h2 \
     --server.port="$PORT" \
     --server.address=0.0.0.0 > "$LOG" 2>&1 &
