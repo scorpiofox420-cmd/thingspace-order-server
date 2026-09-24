@@ -1,76 +1,64 @@
-# Render Blueprint - deploys the web service + a managed Postgres database.
-#
-# How to use:
-#   1. Push this repo to GitHub (see README "Deploy" notes).
-#   2. On render.com, click "New +" -> "Blueprint" and select the repo.
-#   3. Fill in any "fromEnv" secrets it asks for (envVar groups below),
-#      then apply. Render creates the Postgres DB and the web service.
-#
-# After deploying, register the callback URL with ThingSpace so async
-# callbacks actually arrive:
-#   https://<your-app>.onrender.com/api/callbacks/device-service
-#
-# Secrets are managed by Render env var groups. providePassword must be true
-# so the DB password is exposed to fromDatabase (otherwise sync fails).
+# Render Blueprint — deploys the ThingSpace Order Server as a free,
+# database-less Docker web service. Order status is persisted in H2
+# (file-backed, THINGSPACE profile h2), so we avoid Render's Postgres
+# (free Postgres plans are retired — a `databases:` block with plan free
+# is exactly what the validator rejects with "something is wrong with the
+# script"). The app has no hard DB dependency.
+
+# Usage:
+#   1. Push this repo to GitHub (branch = master).
+#   2. render.com -> New + -> Blueprint -> select or paste the repo URL.
+#   3. Fill in the four `fromEnv` secrets it asks for (client id/secret,
+#      UWS username/password), then Apply. Render builds the web service.
+#   4. After deploy, register the callback URL with ThingSpace:
+#      https://<your-app>.onrender.com/api/callbacks/device-service
 
 version: "1"
-
-databases:
-  - name: thingspace-orders-db
-    plan: free
-    databaseName: thingspace_orders
-    user: thingspace
-    providePassword: true
 
 services:
   - type: web
     name: thingspace-order-server
     runtime: docker
     plan: free
+    region: oregon
     dockerfilePath: Dockerfile
     healthCheckPath: /api/orders
     envVars:
-      - key: DB_HOST
-        fromDatabase:
-          name: thingspace-orders-db
-          property: hostname
-      - key: DB_PORT
-        fromDatabase:
-          name: thingspace-orders-db
-          property: port
-      - key: DB_NAME
-        fromDatabase:
-          name: thingspace-orders-db
-          property: database
-      - key: DB_USER
-        fromDatabase:
-          name: thingspace-orders-db
-          property: username
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: thingspace-orders-db
-          property: password
-      - key: DB_PARAMS
-        value: "?sslmode=require"
-      # --- Required: you must provide these at Blueprint creation ---
+      - key: SPRING_PROFILES_ACTIVE
+        value: h2
+      - key: SERVER_PORT
+        value: "8080"
+      - key: SERVER_ADDRESS
+        value: 0.0.0.0
+      - key: CORS_ALLOWED_METHODS
+        value: "*"
+      - key: THINGSPACE_ENVIRONMENT
+        value: PRODUCTION
+      - key: THINGSPACE_POLL_INTERVAL_MS
+        value: "300000"
+      # --- Required: must be provided at Blueprint creation ---
       - key: THINGSPACE_OAUTH_CLIENT_ID
         value: fromEnv
       - key: THINGSPACE_OAUTH_CLIENT_SECRET
         value: fromEnv
-      - key: THINGSPACE_VZ_M2M_TOKEN
+      - key: THINGSPACE_UWS_USERNAME
         value: fromEnv
+      - key: THINGSPACE_UWS_PASSWORD
+        value: fromEnv
+      # --- Optional: set in the Render dashboard after deploy ---
       - key: THINGSPACE_ACCOUNT_NAME
         value: fromEnv
-      - key: THINGSPACE_ENVIRONMENT
-        value: PRODUCTION
-      # --- Optional: set in the Render dashboard later if needed ---
       - key: THINGSPACE_REQUEST_IDS
-        sync: false
+        value: fromEnv
+      - key: THINGSPACE_DEVICE_ICCID
+        value: fromEnv
+      - key: THINGSPACE_DEVICE_IMEI
+        value: fromEnv
+      - key: THINGSPACE_DEVICE_MDN
+        value: fromEnv
       - key: THINGSPACE_BASE_URL
         sync: false
       - key: THINGSPACE_CREDENTIAL_BASE_URL
         sync: false
-      - key: THINGSPACE_POLL_INTERVAL_MS
-        value: "300000"
-      - key: CORS_ALLOWED_METHODS
-        value: "*"
+      - key: THINGSPACE_VZ_M2M_TOKEN
+        sync: false
