@@ -38,16 +38,22 @@ services:
         value: "300000"
       # --- Required: must be provided at Blueprint creation ---
       - key: THINGSPACE_OAUTH_CLIENT_ID
-        value: fromEnv
+        value: your_client_id_here
       - key: THINGSPACE_OAUTH_CLIENT_SECRET
         value: fromEnv
       - key: THINGSPACE_UWS_USERNAME
         value: fromEnv
       - key: THINGSPACE_UWS_PASSWORD
         value: fromEnv
+      - key: THINGSPACE_VZ_M2M_TOKEN
+        value: your_vz_m2m_token_here
       # --- Optional: set in the Render dashboard after deploy ---
       - key: THINGSPACE_ACCOUNT_NAME
-        value: fromEnv
+        value: "742899750-00001"
+      - key: THINGSPACE_BASE_URL
+        value: https://thingspace.verizon.com
+      - key: THINGSPACE_CREDENTIAL_BASE_URL
+        sync: false
       - key: THINGSPACE_REQUEST_IDS
         value: fromEnv
       - key: THINGSPACE_DEVICE_ICCID
@@ -56,9 +62,3 @@ services:
         value: fromEnv
       - key: THINGSPACE_DEVICE_MDN
         value: fromEnv
-      - key: THINGSPACE_BASE_URL
-        sync: false
-      - key: THINGSPACE_CREDENTIAL_BASE_URL
-        sync: false
-      - key: THINGSPACE_VZ_M2M_TOKEN
-        sync: false
