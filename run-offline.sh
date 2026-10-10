@@ -62,4 +62,4 @@ case "${1:-start}" in
   stop)  stop ;;
   logs)  tail -f "$LOG" ;;
   *)     echo "Usage: $0 [start|stop|logs]" ;;
-esac
+esac 
