@@ -1,46 +1,14 @@
-const iotDevices = [
-  {
-    imei: "861234041907083",
-    iccid: "89018428820253296793",
-    servicePlan: "Global IoT 50MB",
-    costCenterCode: "CC-FLEET-101",
-    groupName: "Asset Trackers",
-    customFields: {
-      field1: "TRK-VEH-8821",
-      field2: "Firmware v2.4.1",
-      field3: "North America Hub",
-      field4: "Tech #4402",
-      field5: "Vehicle OBD-II Tracker"
-    }
+{
+  "name": "thingspace-provisioning-server",
+  "version": "1.0.0",
+  "description": "Verizon ThingSpace automated provisioning and order server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
   },
-  {
-    imei: "869876021371029",
-    iccid: "89442558500307980311",
-    servicePlan: "Meter Low-Power 10MB",
-    costCenterCode: "CC-UTILITY-402",
-    groupName: "Smart Meters",
-    customFields: {
-      field1: "MTR-GRID-0941",
-      field2: "Hardware Rev C",
-      field3: "Sector 12 Substation",
-      field4: "Tech #1098",
-      field5: "Gas meter telemetry pulse"
-    }
-  },
-  {
-    imei: "358245091490176",
-    iccid: "89498522397717542889",
-    servicePlan: "Enterprise Fleet 500MB",
-    costCenterCode: "CC-LOGISTICS-204",
-    groupName: "Cold Chain Monitors",
-    customFields: {
-      field1: "REEFER-CONT-512",
-      field2: "IP67 Sensor Unit",
-      field3: "Rotterdam Port Gateway",
-      field4: "Inspector Klaus",
-      field5: "Vaccine cold chain logger"
-    }
+  "dependencies": {
+    "axios": "^1.7.0",
+    "express": "^4.19.2"
   }
-];
+}
 
-module.exports = iotDevices;
