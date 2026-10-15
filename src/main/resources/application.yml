@@ -1,6 +1,6 @@
 server:
   # SERVER_PORT/PORT are injected by hosting platforms like Render.
-  port: ${SERVER_PORT:${PORT:8080}}
+  port: ${SERVER_PORT:${PORT:10000}}
 
 spring:
   datasource:
