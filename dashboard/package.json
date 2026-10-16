@@ -1,0 +1,20 @@
+{
+  "name": "thingspace-dashboard",
+  "version": "1.0.0",
+  "description": "ThingSpace Order Dashboard - Static HTML frontend",
+  "private": true,
+  "scripts": {
+    "build": "echo 'No build step required for static HTML'",
+    "dev": "npx http-server . -p 3000"
+  },
+  "keywords": [
+    "verizon",
+    "thingspace",
+    "dashboard"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
