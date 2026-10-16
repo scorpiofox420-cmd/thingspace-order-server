@@ -103,14 +103,14 @@ $MVN clean package -DskipTests -q
 
 # ---- Run ----
 echo ""
-echo "Starting server on http://localhost:${SERVER_PORT:-8080}..."
+echo "Starting server on http://localhost:${SERVER_PORT:-10000}..."
 echo ""
 echo "API endpoints:"
-echo "  http://localhost:${SERVER_PORT:-8080}/api/orders"
-echo "  http://localhost:${SERVER_PORT:-8080}/api/device-orders"
-echo "  http://localhost:${SERVER_PORT:-8080}/api/device-details"
-echo "  http://localhost:${SERVER_PORT:-8080}/api/credentials"
-echo "  http://localhost:${SERVER_PORT:-8080}/api/callbacks"
+echo "  http://localhost:${SERVER_PORT:-10000}/api/orders"
+echo "  http://localhost:${SERVER_PORT:-10000}/api/device-orders"
+echo "  http://localhost:${SERVER_PORT:-10000}/api/device-details"
+echo "  http://localhost:${SERVER_PORT:-10000}/api/credentials"
+echo "  http://localhost:${SERVER_PORT:-10000}/api/callbacks"
 echo ""
 
 java -jar target/thingspace-order-server-0.1.0.jar
