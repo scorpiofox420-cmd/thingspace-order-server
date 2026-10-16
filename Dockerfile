@@ -1,15 +1,16 @@
-# ---- Build stage ----
-FROM maven:3.9-eclipse-temurin-17 AS build
+# Stage 1: Build Java Application
+FROM eclipse-temurin:17-jdk-jammy AS builder
 WORKDIR /app
-COPY pom.xml .
-RUN mvn -q -B dependency:go-offline
-COPY src ./src
-RUN mvn -q -B clean package -DskipTests
+COPY . .
 
-# ---- Runtime stage ----
-FROM eclipse-temurin:17-jre
+# Grant execute permissions and skip unit tests during build
+RUN chmod +x gradlew
+RUN ./gradlew bootJar -x test --no-daemon
+
+# Stage 2: Runtime Image
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
-COPY --from=build /app/target/thingspace-order-server-0.1.0.jar app.jar
-EXPOSE 8080
-ENV JAVA_OPTS="-Xms256m -Xmx512m"
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
+COPY --from=builder /app/build/libs/*.jar app.jar
+
+EXPOSE 10000
+ENTRYPOINT ["java", "-jar", "app.jar"]
