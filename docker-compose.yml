@@ -37,7 +37,7 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "${PORT:-8080}:8080"
+      - "${PORT:-10000}:10000"
     environment:
       DB_HOST: db
       DB_PORT: 5432
@@ -45,7 +45,7 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_PARAMS: ""
-      SERVER_PORT: 8080
+      SERVER_PORT: 10000
       THINGSPACE_OAUTH_CLIENT_ID: ${THINGSPACE_OAUTH_CLIENT_ID:-}
       THINGSPACE_OAUTH_CLIENT_SECRET: ${THINGSPACE_OAUTH_CLIENT_SECRET:-}
       THINGSPACE_VZ_M2M_TOKEN: ${THINGSPACE_VZ_M2M_TOKEN:-}
