@@ -1,0 +1,21 @@
+{
+  "name": "thingspace-order-server",
+  "version": "0.1.0",
+  "description": "Live server that polls ThingSpace for order status and exposes it via a REST API, backed by Postgres",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "echo \"No tests configured for static HTML dashboard\""
+  },
+  "dependencies": {
+    "@vercel/speed-insights": "^1.0.14"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "verizon",
+    "thingspace",
+    "order-tracking"
+  ],
+  "author": "",
+  "license": "UNLICENSED"
+}
