@@ -6,9 +6,7 @@ import com.verizon.thingspace.models.ActivateDevicesRequest;
 import com.verizon.thingspace.models.CheckOrderStatusRequest;
 import com.verizon.thingspace.models.DeviceManagementResult;
 
-import java.io.IOException;
 
-/**
  * Maps to the Device Management API.
  *
  *   uploadDeviceIdentifier(CheckOrderStatusRequest body)
