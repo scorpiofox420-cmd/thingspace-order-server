@@ -1,14 +1,18 @@
-FROM eclipse-temurin:17-jdk-jammy AS builder
+# Build stage using official Maven image with Java 17
+FROM maven:3.8.5-eclipse-temurin-17 AS builder
 WORKDIR /app
 
+# Copy project files
 COPY pom.xml .
 COPY src ./src
 
-RUN ./mvnw clean package -DskipTests || mvn clean package -DskipTests
+# Build the jar file using standard maven command
+RUN mvn clean package -DskipTests
 
+# Run stage
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
 
-EXPOSE 10000
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
