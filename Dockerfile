@@ -1,7 +1,7 @@
 # Stage 1: Build Java Application
 FROM eclipse-temurin:17-jdk-jammy AS builder
 WORKDIR /app
-COPY . .
+COPY . . 
 
 # Grant execute permissions and skip unit tests during build
 RUN chmod +x gradlew
