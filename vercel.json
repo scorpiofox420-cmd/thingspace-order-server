@@ -1,6 +1,7 @@
 {
   "version": 2,
-  "buildCommand": null,
+  "installCommand": "npm --prefix dashboard ci",
+  "buildCommand": "npm --prefix dashboard run build",
   "outputDirectory": "dashboard",
   "cleanUrls": true
 }
