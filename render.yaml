@@ -1,7 +1,7 @@
 # Render Blueprint — deploys the ThingSpace Order Server as a free,
 # database-less Docker web service using file-backed H2 persistence.
 
-version: "1"
+version: '1'
 
 services:
   - type: web
@@ -15,14 +15,17 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: h2
       - key: SERVER_PORT
+        value: '10000'
         value: "10000"
       - key: SERVER_ADDRESS
         value: 0.0.0.0
       - key: CORS_ALLOWED_METHODS
-        value: "*"
+        value: '*'
       - key: THINGSPACE_ENVIRONMENT
         value: PRODUCTION
       - key: THINGSPACE_POLL_INTERVAL_MS
+        value: '300000'
+      # --- Required: must be provided at Blueprint creation ---
         value: "300000"
       # --- Required Credentials ---
       - key: THINGSPACE_OAUTH_CLIENT_ID
@@ -37,7 +40,7 @@ services:
         value: fromEnv
       # --- Account & Endpoints ---
       - key: THINGSPACE_ACCOUNT_NAME
-        value: "742899750-00001"
+        value: 742899750-00001
       - key: THINGSPACE_BASE_URL
         value: https://thingspace.verizon.com/api
       - key: THINGSPACE_CREDENTIAL_BASE_URL

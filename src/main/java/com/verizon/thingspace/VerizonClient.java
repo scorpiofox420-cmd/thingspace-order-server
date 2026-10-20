@@ -1,4 +1,4 @@
-package com.verizon.thingspace;
+öpackage com.verizon.thingspace;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
