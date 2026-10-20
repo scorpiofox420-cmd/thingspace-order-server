@@ -22,6 +22,9 @@ target/
 .local/
 .npm/
 
+# Node.js dependencies
+node_modules/
+
 # stray local files
 MIGRATE/
 target-tmp/

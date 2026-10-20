@@ -8,6 +8,7 @@
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 </script>
 <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
+<script defer src="/_vercel/analytics/script.js"></script>
 <style>
   :root {
     --red: #cd040b;
@@ -89,7 +90,7 @@
 <header>
   <h1>ThingSpace <span>Order Dashboard</span></h1>
   <div class="controls">
-    <input type="text" id="apiBase" placeholder="API base URL (default: this origin)" />
+    <input type="text" id="apiBase" placeholder="API base URL" />
     <button class="secondary" onclick="refreshAll()">Refresh</button>
     <button onclick="pollNow()">Poll now</button>
   </div>
@@ -158,9 +159,10 @@
 <script>
 const params = new URLSearchParams(location.search);
 const apiInput = document.getElementById('apiBase');
+const defaultApiBase = 'https://thingspace-order-server-tkv4.onrender.com';
 function apiUrl() {
   let base = apiInput.value.trim();
-  if (!base) base = params.get('api') || location.origin;
+  if (!base) base = params.get('api') || defaultApiBase;
   return base.replace(/\/+$/, '');
 }
 apiInput.value = apiUrl();
