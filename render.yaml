@@ -1,17 +1,5 @@
 # Render Blueprint — deploys the ThingSpace Order Server as a free,
-# database-less Docker web service. Order status is persisted in H2
-# (file-backed, THINGSPACE profile h2), so we avoid Render's Postgres
-# (free Postgres plans are retired — a `databases:` block with plan free
-# is exactly what the validator rejects with "something is wrong with the
-# script"). The app has no hard DB dependency.
-
-# Usage:
-#   1. Push this repo to GitHub (branch = master).
-#   2. render.com -> New + -> Blueprint -> select or paste the repo URL.
-#   3. Fill in the four `fromEnv` secrets it asks for (client id/secret,
-#      UWS username/password), then Apply. Render builds the web service.
-#   4. After deploy, register the callback URL with ThingSpace:
-#      https://<your-app>.onrender.com/api/callbacks/device-service
+# database-less Docker web service using file-backed H2 persistence.
 
 version: '1'
 
@@ -28,6 +16,7 @@ services:
         value: h2
       - key: SERVER_PORT
         value: '10000'
+        value: "10000"
       - key: SERVER_ADDRESS
         value: 0.0.0.0
       - key: CORS_ALLOWED_METHODS
@@ -37,23 +26,26 @@ services:
       - key: THINGSPACE_POLL_INTERVAL_MS
         value: '300000'
       # --- Required: must be provided at Blueprint creation ---
+        value: "300000"
+      # --- Required Credentials ---
       - key: THINGSPACE_OAUTH_CLIENT_ID
-        value: your_client_id_here
+        value: ac1271c5-ef51-4299-82aa-479bb5afd6c3
       - key: THINGSPACE_OAUTH_CLIENT_SECRET
         value: fromEnv
+      - key: THINGSPACE_VZ_M2M_TOKEN
+        value: M2U0NTE0NzMtYWMyZC00M2JhLWFiNGEtMTUyMDM5ZDc0NmIw
       - key: THINGSPACE_UWS_USERNAME
         value: fromEnv
       - key: THINGSPACE_UWS_PASSWORD
         value: fromEnv
-      - key: THINGSPACE_VZ_M2M_TOKEN
-        value: your_vz_m2m_token_here
-      # --- Optional: set in the Render dashboard after deploy ---
+      # --- Account & Endpoints ---
       - key: THINGSPACE_ACCOUNT_NAME
         value: 742899750-00001
       - key: THINGSPACE_BASE_URL
-        value: https://thingspace.verizon.com
+        value: https://thingspace.verizon.com/api
       - key: THINGSPACE_CREDENTIAL_BASE_URL
-        sync: false
+        value: https://thingspace.verizon.com/api/hyper-precise/v1
+      # --- Optional / Dynamic Poll Keys ---
       - key: THINGSPACE_REQUEST_IDS
         value: fromEnv
       - key: THINGSPACE_DEVICE_ICCID

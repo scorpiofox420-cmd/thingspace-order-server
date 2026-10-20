@@ -9,8 +9,8 @@
 #   - Binds 0.0.0.0 so other devices on the same LAN/phone can open it
 #
 # The server is available at:
-#   - On this phone:     http://localhost:8080
-#   - Other devices:     http://<this-phone-ip>:8080
+#   - On this phone:     http://localhost:10000
+#   - Other devices:     http://<this-phone-ip>:10000
 #
 # NOTE: ThingSpace live polling needs internet. Offline, the API still
 # serves orders/callbacks/device data saved on-device.
@@ -27,7 +27,7 @@ cd "$PROJECT_DIR"
 
 JAR="target/thingspace-order-server-0.1.0.jar"
 LOG="$PROJECT_DIR/.server.log"
-PORT="${PORT:-8080}"
+PORT="${PORT:-10000}"
 
 [ -f "$JAR" ] || { echo "✖ No jar found at $JAR — run ./deploy.sh build once (needs internet)."; exit 1; }
 
@@ -62,4 +62,4 @@ case "${1:-start}" in
   stop)  stop ;;
   logs)  tail -f "$LOG" ;;
   *)     echo "Usage: $0 [start|stop|logs]" ;;
-esac
+esac 

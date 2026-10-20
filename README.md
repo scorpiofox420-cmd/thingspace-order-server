@@ -88,7 +88,7 @@ session, you'll have to wire that up separately.
    # or: docker compose up
    ```
 
-The server starts on `http://localhost:8080`. The scheduler kicks off immediately and then
+The server starts on `http://localhost:10000`. The scheduler kicks off immediately and then
 repeats every `THINGSPACE_POLL_INTERVAL_MS` milliseconds (default: every 5 minutes).
 
 ## API

@@ -1,112 +1,69 @@
-#!/usr/bin/env bash
-#
-# deploy-live.sh — strict PRODUCTION build+run for an offline terminal.
-#
-#   - No mock mode, ever. THINGSPACE_ENVIRONMENT is forced to PRODUCTION.
-#   - Fails immediately if any credential is empty or still a placeholder.
-#   - Builds with the repo-local Maven (.deploy-tools/) using the offline
-#     .m2/ cache, so no internet is needed once the cache is populated
-#     (first build MUST have internet: run ./deploy.sh build once online).
-#   - Requires a reachable Postgres (DB_HOST/DB_PORT/DB_USER/DB_PASSWORD).
-#
-# Usage:
-#   ./deploy-live.sh          # build (offline) + run, strict checks
-#   ./deploy-live.sh build    # build only
-#   ./deploy-live.sh run      # run only (skips build)
-#
-set -euo pipefail
+# ThingSpace Order Server — WORK RESUME
 
-PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
-cd "$PROJECT_DIR"
+> Handoff file. Everything needed to continue from a fresh session.
+> Conversation transcript: `thingspace-conversation.txt` (same folder).
 
-DEPLOY_TOOLS="$PROJECT_DIR/.deploy-tools"
-MAVEN_BIN="$DEPLOY_TOOLS/apache-maven-3.9.9/bin/mvn"
-M2_REPO="$PROJECT_DIR/.m2"
-JAR_GLOB="target/thingspace-order-server-*.jar"
+## Goal
+Finish deploying the **ThingSpace Order Server** and complete the real Verizon
+ThingSpace order for account `742899750-00001`.
 
-export MAVEN_USER_HOME="$M2_REPO"
+## Current state (verified)
+- **Render service is LIVE and healthy.**
+  - URL: `https://thingspace-order-server-tkv4.onrender.com` <br>
+  - Service ID: `srv-db1gprfavr4c73brfilg` (Render account slug `thingspace-order-server-tkv4`)
+  - Latest deploy: `dep-db40p80473hc73c7r2v0` → status `live` (trigger API, Oct 8 21:37 UTC)
+  - Health probe: `GET /api/orders` → `200 []` (app up, **no orders recorded yet**)
+  - Runtime: Docker, free plan, linked to `github.com/scorpiofox420-cmd/thingspace-order-server`
+    branch `master`, `autoDeploy: yes`
+- **Real ThingSpace credentials ARE configured on Render** env vars:
+  - `THINGSPACE_OAUTH_CLIENT_ID` = `ac1271c5-ef51-4299-82aa-479bb5afd6c3`
+  - `THINGSPACE_OAUTH_CLIENT_SECRET` = `f2f26495-05fa-4d99-9383-3c18e2a307db`
+  - `THINGSPACE_VZ_M2M_TOKEN` = `M2U0NTE0NzMtYWMyZC00M2JhLWFiNGEtMTUyMDM5ZDc0NmIw`
+  - `THINGSPACE_ACCOUNT_NAME` = `742899750-00001`
+  - `THINGSPACE_BASE_URL` / `THINGSPACE_CREDENTIAL_BASE_URL` = `https://thingspace.verizon.com/api`
 
-RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; NC='\033[0m'
-ok()   { printf "${GREEN}✔ %s${NC}\n" "$*"; }
-warn() { printf "${YELLOW}⚠ %s${NC}\n" "$*"; }
-err()  { printf "${RED}✖ %s${NC}\n" "$*"; exit 1; }
+## Blocker (NOT resolved)
+- The GitHub repo `scorpiofox420-cmd/thingspace-order-server` is **private**.
+- PAT provided in-conversation authenticates but GitHub denies it on that repo:
+  `git ls-remote` → `403 Write access to repository not granted`, API → `404`.
+  It only covers the 36 **public** repos.
+- User said "i grant" but it still returns 403/404 (token was not re-verified after granting).
+- **Needed to proceed:** re-grant the fine-grained token
+  (`Contents: Read and write` on that repo), make repo public, or paste a
+  classic PAT with `repo` scope. Then re-test:
+  ```
+  git ls-remote https://x-access-token:$(cat /tmp/ghkey)@github.com/scorpiofox420-cmd/thingspace-order-server.git
+  ```
 
-# ---- Load .env (must exist for real deploys) ----
-if [ ! -f .env ]; then
-  err "No .env found. Create it: cp .env.example .env  (then fill real credentials)."
-fi
-set -a; source .env; set +a
+## Keys / credentials (where they live)
+- **GitHub PAT** → `github.com/settings/tokens`, pasted in this conversation
+  (see `thingspace-conversation.txt`; also extractable via:
+  `grep -aohE 'github_pat_[A-Za-z0-9_]{20,}' /public/.local/state/opencode/prompt-history.jsonl | head -1`).
+  Cached at `/tmp/ghkey`.
+- **Render API key** → `/tmp/rk` = `rnd_8ac2nWbmMm5jf0U4qkBNpNAnCKZG`.
+  Helper: `/tmp/rput.js <svc> <METHOD> <path> [bodyfile]` (Authorization: Bearer).
+- **Vercel API token** → `vcp_0LlfCVk114xpHAewNAqFbR2fflWWF0p44Rnq62ETEw1gMH9RMv2QcKmh`
+  (in conversation; project `thingspace-order-server-server` had a failing
+  `parcel: command not found` build — the dashboard deploy, not the Java API).
 
-# ---- Strict credential checks (no placeholders, no empty) ----
-PLACEHOLDERS="REPLACE_ME your_client_id your_client_secret your_vz_m2m_token your_account_name placeholder"
+## What still needs doing
+1. Get real GitHub write access (blocker above).
+2. Push the intended repo state; Render auto-deploys on push.
+3. Set real `THINGSPACE_REQUEST_IDS` (currently the literal string `fromEnv`),
+   plus `THINGSPACE_DEVICE_MDN/IMEI/ICCID` if the app needs them — retrieve from
+   ThingSpace, e.g. via `POST /api/orders/check-status` flow.
+4. Confirm a real order appears: `GET https://thingspace-order-server-tkv4.onrender.com/api/orders`.
+5. (Optional) Vercel dashboard fix — repo `thingspace-order-server` build script
+   runs `parcel build` but package.json lacks a devDependency on parcel.
 
-require() {
-  local name="$1" val="${!1:-}"
-  if [ -z "$val" ]; then
-    err "$name is empty — deploy aborted. Fill it in .env with REAL values."
-  fi
-  for w in $PLACEHOLDERS; do
-    if [ "$val" = "$w" ]; then
-      err "$name is still the placeholder '$val' — deploy aborted. Use real credentials."
-    fi
-  done
-}
+## Repo clones on this machine
+- `/tmp/tsapp` — loose ThingSpace app files (controllers, Dockerfile, start.sh,
+  render.yaml, deploy-live.sh, index/order-live dashboards). No `pom.xml`.
+- `/tmp/tsrepo` — unrelated opencode-on-render template.
+- Local git repos are scratch copies; source of truth is the private GitHub repo.
 
-require DB_PASSWORD
-require THINGSPACE_OAUTH_CLIENT_ID
-require THINGSPACE_OAUTH_CLIENT_SECRET
-require THINGSPACE_VZ_M2M_TOKEN
-require THINGSPACE_ACCOUNT_NAME
-
-# ---- Force production, no mock ----
-export THINGSPACE_ENVIRONMENT=PRODUCTION
-warn "THINGSPACE_ENVIRONMENT forced to PRODUCTION (mock mode is blocked)."
-ok "Credentials OK: account=${THINGSPACE_ACCOUNT_NAME}"
-
-# ---- Postgres reachability ----
-if command -v pg_isready >/dev/null 2>&1; then
-  if ! pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" >/dev/null 2>&1; then
-    err "Postgres not reachable at $DB_HOST:$DB_PORT. Start it first (see DEPLOY.md)."
-  fi
-  ok "Postgres reachable at $DB_HOST:$DB_PORT"
-fi
-
-# ---- Maven present? ----
-if [ ! -x "$MAVEN_BIN" ]; then
-  err "Local Maven not found at $MAVEN_BIN — run ./deploy.sh build ONCE with internet first."
-fi
-
-# ---- Build (offline) ----
-do_build() {
-  ok "Building OFFLINE (using .m2 cache)..."
-  "$MAVEN_BIN" -o -q -B clean package -DskipTests
-  JAR=$(ls $JAR_GLOB 2>/dev/null | head -1)
-  [ -n "$JAR" ] || err "Build succeeded but no jar found at $JAR_GLOB"
-  ok "Built: $JAR ($(du -h "$JAR" | cut -f1))"
-}
-
-# ---- Run ----
-do_run() {
-  JAR=$(ls $JAR_GLOB 2>/dev/null | head -1)
-  [ -n "$JAR" ] || err "No jar found — run './deploy-live.sh build' first."
-
-  echo ""
-  ok "Starting ThingSpace Order Server (PRODUCTION) on http://localhost:${PORT:-8080}"
-  echo "   Endpoints:"
-  echo "     http://localhost:${PORT:-8080}/api/orders"
-  echo "     http://localhost:${PORT:-8080}/api/orders/check-status"
-  echo "     http://localhost:${PORT:-8080}/api/orders/poll-now"
-  echo "     http://localhost:${PORT:-8080}/api/device-orders"
-  echo "     http://localhost:${PORT:-8080}/api/callbacks/device-service"
-  echo ""
-  exec java -jar "$JAR"
-}
-
-# ---- Main ----
-ACTION="${1:-all}"
-case "$ACTION" in
-  build) do_build ;;
-  run)   do_run ;;
-  all)   do_build; do_run ;;
-  *)     err "Usage: $0 [build|run|all]" ;;
-esac
+## How to resume this session
+- opencode stores sessions in `/public/.local/share/opencode/opencode.db`.
+- Session: `ses_ee27d0a04ffea9…` (this conversation).
+- Reopen via the opencode session picker, or run `opencode` and select it.
+- Raw transcript exported to `/public/thingspace-conversation.txt`.

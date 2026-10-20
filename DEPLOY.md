@@ -36,7 +36,7 @@ https://your-app.onrender.com/api/callbacks/device-service
 docker compose up
 ```
 
-- Starts Postgres (port 5432) + the app (port 8080)
+- Starts Postgres (port 5432) + the app (port 10000)
 - Data persists in a named volume
 - ThingSpace credentials come from `.env` or shell env vars
 - Stop with `docker compose down`
@@ -64,7 +64,7 @@ createdb thingspace_orders
 ```
 
 `start.sh` auto-detects the platform, checks tools, builds, and runs.
-Server: `http://localhost:8080`.
+Server: `http://localhost:10000`.
 
 ## 4. Android — Acode / Termux
 
@@ -87,7 +87,7 @@ cp .env.example .env
 ./start.sh
 ```
 
-Server: `http://localhost:8080`. On your phone, open `http://192.168.x.x:8080`
+Server: `http://localhost:10000`. On your phone, open `http://192.168.x.x:8080`
 from other devices on the same Wi-Fi.
 
 ## 5. Vercel (web dashboard)
@@ -127,7 +127,7 @@ CORS_ALLOWED_ORIGINS=https://your-dashboard.vercel.app
 | `DB_USER` | `postgres` | Postgres user |
 | `DB_PASSWORD` | `postgres` | Postgres password |
 | `DB_PARAMS` | *(empty)* | Extra JDBC params, e.g. `?sslmode=require` (Render) |
-| `SERVER_PORT` / `PORT` | `8080` | HTTP port |
+| `SERVER_PORT` / `PORT` | `10000` | HTTP port |
 | `THINGSPACE_OAUTH_CLIENT_ID` | — | ThingSpace OAuth key |
 | `THINGSPACE_OAUTH_CLIENT_SECRET` | — | ThingSpace OAuth secret |
 | `THINGSPACE_VZ_M2M_TOKEN` | — | VZ-M2M session token |
