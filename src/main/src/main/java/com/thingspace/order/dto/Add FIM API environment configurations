@@ -1,0 +1,3 @@
+fim.api.username=${FIM_USERNAME}
+fim.api.password=${FIM_PASSWORD}
+fim.api.app-id=backend!
