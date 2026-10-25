@@ -1,0 +1,10 @@
+package com.thingspace.order.repository;
+
+import com.thingspace.order.model.VerifiedOrder;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface VerifiedOrderRepository extends JpaRepository<VerifiedOrder, Long> {
+    VerifiedOrder findByOrderNumber(String orderNumber);
+}
