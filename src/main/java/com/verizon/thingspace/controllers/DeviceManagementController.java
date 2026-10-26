@@ -1,7 +1,10 @@
 package com.verizon.thingspace.controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.verizon.thingspace.VerizonClient;
+import com.verizon.thingspace.http.response.ApiResponse;
+import com.verizon.thingspace.models.CheckOrderStatusRequest;
+import com.verizon.thingspace.models.ActivateDevicesRequest;
+import com.verizon.thingspace.models.DeviceManagementResult;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,31 +18,31 @@ public class DeviceManagementController {
         this.client = client;
     }
 
-    /**
-     * Health/Status check or proxy endpoint for device operations.
-     */
-    @GetMapping("/status")
-    public ResponseEntity<JsonNode> checkStatus() {
-        JsonNode responseNode = client.mapper().createObjectNode()
-                .put("status", "ONLINE")
-                .put("service", "ThingSpace Device Management Controller");
-        return ResponseEntity.ok(responseNode);
+    @PostMapping("/requests/status")
+    public ResponseEntity<DeviceManagementResult> uploadDeviceIdentifier(
+            @RequestBody CheckOrderStatusRequest body) throws Exception {
+        
+        String url = client.baseUrl() + "/m2m/v1/devices/requests/status";
+        VerizonClient.HttpResult result = client.request("POST", url, body);
+        result.requireOk();
+        
+        DeviceManagementResult parsed = client.mapper().treeToValue(
+            result.json(), DeviceManagementResult.class);
+            
+        return ResponseEntity.status(result.statusCode()).body(parsed);
     }
 
-    /**
-     * Example endpoint to proxy device actions or queries via VerizonClient.
-     */
-    @GetMapping("/info")
-    public ResponseEntity<JsonNode> getDeviceInfo(
-            @RequestParam(required = false) String accountName,
-            @RequestParam(required = false) String imei) {
+    @PostMapping("/actions/activate")
+    public ResponseEntity<DeviceManagementResult> activateDevices(
+            @RequestBody ActivateDevicesRequest body) throws Exception {
         
-        // If needed, you can implement direct Verizon API calls here using client.request(...)
-        JsonNode infoNode = client.mapper().createObjectNode()
-                .put("accountName", accountName != null ? accountName : "default-account")
-                .put("imei", imei != null ? imei : "unknown")
-                .put("message", "Device controller is active and ready.");
-                
-        return ResponseEntity.ok(infoNode);
+        String url = client.baseUrl() + "/m2m/v1/devices/actions/activate";
+        VerizonClient.HttpResult result = client.request("POST", url, body);
+        result.requireOk();
+        
+        DeviceManagementResult parsed = client.mapper().treeToValue(
+            result.json(), DeviceManagementResult.class);
+            
+        return ResponseEntity.status(result.statusCode()).body(parsed);
     }
 }
