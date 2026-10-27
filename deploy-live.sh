@@ -42,7 +42,7 @@ ThingSpace order for account `742899750-00001`.
   Cached at `/tmp/ghkey`.
 - **Render API key** → `/tmp/rk` = `rnd_8ac2nWbmMm5jf0U4qkBNpNAnCKZG`.
   Helper: `/tmp/rput.js <svc> <METHOD> <path> [bodyfile]` (Authorization: Bearer).
-- **Vercel API token** → `vcp_0LlfCVk114xpHAewNAqFbR2fflWWF0p44Rnq62ETEw1gMH9RMv2QcKmh`
+
   (in conversation; project `thingspace-order-server-server` had a failing
   `parcel: command not found` build — the dashboard deploy, not the Java API).
 
