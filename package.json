@@ -8,9 +8,9 @@
     "test": "echo \"No tests configured for static HTML dashboard\""
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^1.0.14"
   },
-  "devDependencies": {},
   "keywords": [
     "verizon",
     "thingspace",
