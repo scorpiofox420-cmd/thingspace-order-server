@@ -40,7 +40,8 @@ public class OrderSubmissionController {
         String url = client.baseUrl() + "/m2m/v1/devices/actions/activate";
         VerizonClient.HttpResult result = client.request("POST", url, verizonPayload);
 
-        if (!result.isOk()) {
+        // Check status code directly instead of .isOk()
+        if (result.statusCode() < 200 || result.statusCode() >= 300) {
             return ResponseEntity.status(result.statusCode())
                     .body("Verizon API Error: " + result.json().toString());
         }
