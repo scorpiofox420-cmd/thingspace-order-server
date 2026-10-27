@@ -1,79 +1,16 @@
-package com.thingspace.order.dto;
+package com.thingspace.order.controller;
 
-public class OrderRequest {
-    private String workOrderNumber;
-    private String clientCustomerId;
-    private String description;
-    private String driverNumber;
-    private AddressDto address;
+import com.thingspace.order.dto.OrderRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-    public String getWorkOrderNumber() {
-        return workOrderNumber;
-    }
+@RestController
+@RequestMapping("/api/orders")
+public class OrderController {
 
-    public void setWorkOrderNumber(String workOrderNumber) {
-        this.workOrderNumber = workOrderNumber;
-    }
-
-    public String getClientCustomerId() {
-        return clientCustomerId;
-    }
-
-    public void setClientCustomerId(String clientCustomerId) {
-        this.clientCustomerId = clientCustomerId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getDriverNumber() {
-        return driverNumber;
-    }
-
-    public void setDriverNumber(String driverNumber) {
-        this.driverNumber = driverNumber;
-    }
-
-    public AddressDto getAddress() {
-        return address;
-    }
-
-    public void setAddress(AddressDto address) {
-        this.address = address;
-    }
-
-    public static class AddressDto {
-        private String addressLine1;
-        private String locality;
-        private String postalCode;
-
-        public String getAddressLine1() {
-            return addressLine1;
-        }
-
-        public void setAddressLine1(String addressLine1) {
-            this.addressLine1 = addressLine1;
-        }
-
-        public String getLocality() {
-            return locality;
-        }
-
-        public void setLocality(String locality) {
-            this.locality = locality;
-        }
-
-        public String getPostalCode() {
-            return postalCode;
-        }
-
-        public void setPostalCode(String postalCode) {
-            this.postalCode = postalCode;
-        }
+    @PostMapping("/submit")
+    public ResponseEntity<String> submitOrder(@RequestBody OrderRequest order) {
+        System.out.println("Received order: " + order.getWorkOrderNumber());
+        return ResponseEntity.ok("Order " + order.getWorkOrderNumber() + " successfully entered!");
     }
 }
